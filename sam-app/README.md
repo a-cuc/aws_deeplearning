@@ -1,5 +1,8 @@
 # sam-app
 
+> [!NOTE]
+> This project was created through `sam init` and contents here would change
+
 This project contains source code and supporting files for a serverless application for classifying handwritten digits using a Machine Learning model in [scikit-learn](https://scikit-learn.org/). It includes the following files and folders:
 
 - app/app.py - Code for the application's Lambda function including the code for ML inferencing.
