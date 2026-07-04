@@ -246,4 +246,4 @@ $RECYCLE.BIN/
 # Ignore other models than final model
 lstm_model.pth
 pruned_lstm_model.pth
-svr_model.pth
+svr_model.pkl
