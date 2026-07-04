@@ -2,9 +2,9 @@ import joblib
 import torch
 from torch import nn
 import json
+import numpy as np
 
 
-device = "cpu"
 
 # Defining the neural network architecture
 class LSTMModel(nn.Module):
@@ -21,22 +21,39 @@ class LSTMModel(nn.Module):
         out, _ = self.lstm(x, (h0, c0))
         out = self.fc(out[:, -1, :])
         return out
-model = LSTMModel(input_size=2, hidden_size=24, num_layers=2, output_size=1).to(device)
+model = LSTMModel(input_size=2, hidden_size=24, num_layers=3, output_size=96).cpu()
 
 # Loading the trained model and scaler
 model.load_state_dict(torch.load('/opt/ml/model/lstm_model.pth'))
 scaler = joblib.load('/opt/ml/model/scaler.pkl')
 
-""" Preprocessing input data for prediction
-data_scaled = scaler.transform(raw_data)  # Example input data
+def preprocess_input(ac_power, dc_power):
+    if len(ac_power) != 96 or len(dc_power) != 96:
+        raise ValueError("AC_POWER and DC_POWER must each contain exactly 96 values")
 
-"""
+    raw_data = np.column_stack((ac_power, dc_power))
+    scaled_data = scaler.transform(raw_data)
+    return torch.tensor(scaled_data, dtype=torch.float32).unsqueeze(0)
+
+
+def inverse_scale_ac_power(prediction_scaled):
+    ac_min = scaler.data_min_[0]
+    ac_max = scaler.data_max_[0]
+    return prediction_scaled * (ac_max - ac_min) + ac_min
 
 
 
 
 def lambda_handler(event, context): 
-    # TODO: Consider input for preprocessing
+    ac_power = event["AC_POWER"]
+    dc_power = event["DC_POWER"]
+
+    X = preprocess_input(ac_power, dc_power).cpu()
+
+    with torch.no_grad():
+        prediction_scaled = model(X).cpu().numpy().ravel()
+
+    prediction = inverse_scale_ac_power(prediction_scaled).tolist()
 
     return {
         'statusCode': 200,

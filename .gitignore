@@ -241,3 +241,9 @@ $RECYCLE.BIN/
 */build/*
 
 # End of https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode
+
+# Additional ignores for this project
+# Ignore other models than final model
+lstm_model.pth
+pruned_lstm_model.pth
+svr_model.pth

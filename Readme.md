@@ -12,3 +12,4 @@ For inference, the expected JSON format are 2 arrays for `AC_POWER` and `DC_POWE
     'DC_POWER' : [1.0, 2.0, ... , 96.0]
 }
 ```
+
