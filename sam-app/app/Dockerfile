@@ -1,10 +1,8 @@
 FROM public.ecr.aws/lambda/python:3.12
 
 COPY app.py requirements.txt ./
-COPY model /opt/ml/model
-
-# temporarily install gcc so that scikit-learn can be built
-RUN dnf install gcc-c++ -y
+COPY quantized_pruned_lstm_model.pth /opt/ml/model/
+COPY scaler.pkl /opt/ml/model/
 
 RUN python3.12 -m pip install -r requirements.txt -t .
 
