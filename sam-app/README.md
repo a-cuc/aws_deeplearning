@@ -1,13 +1,13 @@
 # sam-app
 
 > [!NOTE]
-> This project was created through `sam init` and contents here would change
+> This project was created through `sam init` and contents here were changed from the original
 
-This project contains source code and supporting files for a serverless application for classifying handwritten digits using a Machine Learning model in [scikit-learn](https://scikit-learn.org/). It includes the following files and folders:
+This project contains source code and supporting files for a serverless application for predicting the AC power generated using historical AC and DC power data. It includes the following files and folders:
 
 - app/app.py - Code for the application's Lambda function including the code for ML inferencing.
 - app/Dockerfile - The Dockerfile to build the container image.
-- app/model - A simple scikit-learn logistic regression model for classifying handwritten digits trained against the MNIST dataset.
+- app/quantized_pruned_lstm_model.pth - An LSTM model trained as a result from [model training](../model_training.ipynb).
 - app/requirements.txt - The pip requirements to be installed during the container build.
 - events - Invocation events that you can use to invoke the function.
 - template.yaml - A template that defines the application's AWS resources.
@@ -65,7 +65,7 @@ The SAM CLI can also emulate your application's API. Use the `sam local start-ap
 
 ```bash
 sam-app$ sam local start-api
-sam-app$ curl http://localhost:3000/classify_digit
+sam-app$ curl http://localhost:3000/predict
 ```
 
 The SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
@@ -75,7 +75,7 @@ The SAM CLI reads the application template to determine the API's routes and the
         Inference:
           Type: Api
           Properties:
-            Path: /classify_digit
+            Path: /predict
             Method: post
 ```
 

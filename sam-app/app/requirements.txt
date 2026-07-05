@@ -1,3 +1,5 @@
 torch
+torchao
 numpy
 joblib
+scikit-learn

@@ -1,5 +1,6 @@
 import joblib
 import torch
+from torchao.quantization import quantize_, Int8DynamicActivationInt8WeightConfig
 from torch import nn
 import json
 import numpy as np
@@ -22,6 +23,7 @@ class LSTMModel(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 model = LSTMModel(input_size=2, hidden_size=24, num_layers=3, output_size=96).cpu()
+quantize_(model, Int8DynamicActivationInt8WeightConfig())
 
 # Loading the trained model and scaler
 model.load_state_dict(torch.load('/opt/ml/model/quantized_pruned_lstm_model.pth', map_location=torch.device('cpu')))
