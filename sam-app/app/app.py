@@ -24,7 +24,7 @@ class LSTMModel(nn.Module):
 model = LSTMModel(input_size=2, hidden_size=24, num_layers=3, output_size=96).cpu()
 
 # Loading the trained model and scaler
-model.load_state_dict(torch.load('/opt/ml/model/lstm_model.pth'))
+model.load_state_dict(torch.load('/opt/ml/model/quantized_pruned_lstm_model.pth', map_location=torch.device('cpu')))
 scaler = joblib.load('/opt/ml/model/scaler.pkl')
 
 def preprocess_input(ac_power, dc_power):
@@ -45,8 +45,15 @@ def inverse_scale_ac_power(prediction_scaled):
 
 
 def lambda_handler(event, context): 
-    ac_power = event["AC_POWER"]
-    dc_power = event["DC_POWER"]
+
+    # Check if the event contains a body (for API Gateway) or is a direct invocation
+    if "body" in event:
+        body = json.loads(event["body"])
+    else:
+        body = event
+
+    ac_power = body["AC_POWER"]
+    dc_power = body["DC_POWER"]
 
     X = preprocess_input(ac_power, dc_power).cpu()
 
