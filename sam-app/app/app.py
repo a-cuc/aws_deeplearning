@@ -73,5 +73,10 @@ def lambda_handler(event, context):
             {
                 "predicted_result": prediction,
             }
-        )
+        ),
+        'headers': { # CORS headers
+            'Access-Control-Allow-Origin': '*',  # NOTE: Bad practice, should be restricted to your frontend domain in production
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',  # Allow POST and OPTIONS methods
+            'Access-Control-Allow-Headers': 'Content-Type',  # Allow Content-Type header
+        }
     }
