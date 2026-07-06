@@ -64,3 +64,16 @@ const response = await fetch('http://localhost:3000/predict', {
   body: fileContent,
 });
 ```
+
+## Deployment
+
+1. Build the container thru the commands below:
+```sh
+cd sam-app
+sam build
+```
+2. Deploy using the script:
+```sh
+cd ../
+./deploy
+```
