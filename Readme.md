@@ -15,7 +15,7 @@ For inference, the expected JSON format are 2 arrays for `AC_POWER` and `DC_POWE
     "TOD_COS"  : [1.0, 2.0, ... , 96.0]
 }
 ```
-Sample data can be found in [/samples](samples) directory
+Sample data can be found in [/samples](samples) directory. Note that the sample file contains another feature called `target` which are the original values from the dataset, which is used for visualizing the difference between the model and actual output
 
 ## Trying it out locally
 
