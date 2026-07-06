@@ -13,6 +13,7 @@ Resources:
   InferenceFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
+      MemorySize: 3000
       PackageType: Image
       Architectures:
         - x86_64
@@ -26,6 +27,8 @@ Resources:
       Dockerfile: Dockerfile
       DockerContext: ./app
       DockerTag: 2-v1
+  Bucket:
+    Type: AWS::S3::Bucket
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -40,3 +43,9 @@ Outputs:
   InferenceFunctionIamRole:
     Description: Implicit IAM Role created for Inference function
     Value: !GetAtt InferenceFunctionRole.Arn
+  BucketName:
+    Description: S3 Bucket for static website
+    Value: !Ref Bucket
+  BucketWebsiteURL:
+    Description: URL for website hosted on S3
+    Value: !GetAtt Bucket.WebsiteURL

@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    Timeout: 50
+    MemorySize: 5000
+  Api:
+    BinaryMediaTypes:
+    - application/json
+Resources:
+  InferenceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      MemorySize: 3000
+      PackageType: Image
+      Architectures:
+      - x86_64
+      Events:
+        Inference:
+          Type: Api
+          Properties:
+            Path: /predict
+            Method: post
+      ImageUri: inferencefunction:2-v1
+    Metadata:
+      DockerContext: /mnt/e/Programming/VSCodeProjects/aws_deeplearning/sam-app/app
+      DockerTag: 2-v1
+      Dockerfile: Dockerfile
+      SamResourceId: InferenceFunction
+  Bucket:
+    Type: AWS::S3::Bucket
+Outputs:
+  InferenceApi:
+    Description: API Gateway endpoint URL for Prod stage for Inference function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/predict/
+  InferenceFunction:
+    Description: Inference Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - InferenceFunction
+      - Arn
+  InferenceFunctionIamRole:
+    Description: Implicit IAM Role created for Inference function
+    Value:
+      Fn::GetAtt:
+      - InferenceFunctionRole
+      - Arn
+  BucketName:
+    Description: S3 Bucket for static website
+    Value:
+      Ref: Bucket
+  BucketWebsiteURL:
+    Description: URL for website hosted on S3
+    Value:
+      Fn::GetAtt:
+      - Bucket
+      - WebsiteURL

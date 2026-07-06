@@ -4,6 +4,7 @@ This is my attempt at learning AWS services by trying to create a static web app
 
 - AI Model is trained on [model_training.ipynb](model_training.ipynb)
 - AWS Services are created using a SAM template in [/sam-app](sam-app) directory
+- S3 static website is made through React+Vite in [/s3-static-app](s3-static-app) directory
 
 For inference, the expected JSON format are 2 arrays for `AC_POWER` and `DC_POWER` with a count of 96 (data taken 15 mins for 24 hours), and `TOD_SIN` and `TOD_COS` which are time of day features:
 ```
@@ -48,4 +49,18 @@ curl -X POST \
   http://localhost:3000/predict \
   -H "Content-Type: application/json" \
   -d @samples/sample_0.json
+```
+
+Or, use the web app directly
+```sh
+cd s3-static-app
+npm run dev
+```
+
+Modify [SimpleUpload.jsx](./s3-static-app/src/components/SimpleUpload.jsx) to point the API locally:
+```jsx
+const response = await fetch('http://localhost:3000/predict', {
+  method: 'POST',
+  body: fileContent,
+});
 ```
