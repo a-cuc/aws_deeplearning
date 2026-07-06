@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function SimpleUpload() {
+export default function SimpleUpload({ setPrediction }) {
   const [file, setFile] = useState(null);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
@@ -53,7 +53,10 @@ export default function SimpleUpload() {
         if (!response.ok) {
           throw new Error(`Server rejected file with status: ${response.status}`);
         }
+        
+        const predictionResult = await response.json();
 
+        setPrediction(predictionResult.predicted_result);
         setStatus('File successfully validated and uploaded!');
         setFile(null);
       } catch (err) {
