@@ -4,7 +4,7 @@ from torchao.quantization import quantize_, Int8DynamicActivationInt8WeightConfi
 from torch import nn
 import json
 import numpy as np
-
+import base64
 
 
 # Defining the neural network architecture
@@ -47,12 +47,13 @@ def inverse_scale_ac_power(prediction_scaled):
 
 
 def lambda_handler(event, context): 
-    # Console check for debugging
-    print("Event:", json.dumps(event, indent=2))
 
     # Check if the event contains a body (for API Gateway) or is a direct invocation
     if "body" in event:
-        body = json.loads(event["body"])
+        body_str = event["body"]
+        if event.get("isBase64Encoded", True):
+            body_str = base64.b64decode(body_str).decode('utf-8')  
+        body = json.loads(body_str)
     else:
         body = event
 
