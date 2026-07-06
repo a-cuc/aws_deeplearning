@@ -34,3 +34,16 @@ aws lambda invoke --function-name "InferenceFunction" \
 --no-verify-ssl --payload "file://samples/sample_0.json" \
 --cli-binary-format "raw-in-base64-out" out.txt
 ```
+
+Test the API functionality
+```sh
+sam local start-api
+```
+
+In a separate terminal, use cURL to invoke the API
+```sh
+curl -X POST \
+  http://localhost:3000/predict \
+  -H "Content-Type: application/json" \
+  -d @samples/sample_0.json
+```
