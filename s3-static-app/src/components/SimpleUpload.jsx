@@ -1,4 +1,6 @@
 import { useState } from 'react';
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 export default function SimpleUpload({ setPrediction, setInputData }) {
   const [file, setFile] = useState(null);
@@ -46,7 +48,7 @@ export default function SimpleUpload({ setPrediction, setInputData }) {
         // OPTIONAL: Add content rules here (e.g., if (!parsedJson.id) throw new Error('Missing ID'))
 
         setStatus('Uploading...');
-        const response = await fetch('http://localhost:3000/predict', {
+        const response = await fetch(API_URL, {
           method: 'POST',
           body: fileContent,
         });

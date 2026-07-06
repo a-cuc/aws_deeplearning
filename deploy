@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -e
+
+# Deploy the SAM application
+cd sam-app
+sam deploy --no-fail-on-empty-changeset
+
+# Get the API URL and S3 bucket name from the CloudFormation stack outputs
+API_URL=$(aws cloudformation describe-stacks \
+  --stack-name sam-app \
+  --query "Stacks[0].Outputs[?OutputKey=='InferenceApi'].OutputValue" \
+  --output text)
+S3_BUCKET_NAME=$(aws cloudformation describe-stacks \
+  --stack-name sam-app \
+  --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" \
+  --output text)
+
+# Update the .env file in the s3-static-app directory with the API URL
+cd ..
+echo "VITE_API_URL=$API_URL" > s3-static-app/.env
+cd s3-static-app
+npm run build
+
+# Sync the build directory to the S3 bucket
+aws s3 sync dist/ s3://$S3_BUCKET_NAME --delete
+
+# Print the S3 bucket URL for accessing the static website
+echo "Static website deployed to: http://$S3_BUCKET_NAME.s3-website-us-east-1.amazonaws.com"
