@@ -5,11 +5,13 @@ This is my attempt at learning AWS services by trying to create a static web app
 - AI Model is trained on [model_training.ipynb](model_training.ipynb)
 - AWS Services are created using a SAM template in [/sam-app](sam-app) directory
 
-For inference, the expected JSON format are 2 arrays for `AC_POWER` and `DC_POWER` with a count of 96 (data taken 15 mins for 24 hours):
+For inference, the expected JSON format are 2 arrays for `AC_POWER` and `DC_POWER` with a count of 96 (data taken 15 mins for 24 hours), and `TOD_SIN` and `TOD_COS` which are time of day features:
 ```
 {
     "AC_POWER" : [1.0, 2.0, ... , 96.0],
-    "DC_POWER" : [1.0, 2.0, ... , 96.0]
+    "DC_POWER" : [1.0, 2.0, ... , 96.0],
+    "TOD_SIN"  : [1.0, 2.0, ... , 96.0],
+    "TOD_COS"  : [1.0, 2.0, ... , 96.0]
 }
 ```
 Sample data can be found in [/samples](samples) directory

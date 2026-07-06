@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function SimpleUpload({ setPrediction }) {
+export default function SimpleUpload({ setPrediction, setInputData }) {
   const [file, setFile] = useState(null);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
@@ -41,6 +41,7 @@ export default function SimpleUpload({ setPrediction }) {
       try {
         // Strict Error Check: This throws a syntax error if JSON layout is malformed
         const parsedJson = JSON.parse(fileContent);
+        setInputData(parsedJson); // Store the parsed JSON for later use
         
         // OPTIONAL: Add content rules here (e.g., if (!parsedJson.id) throw new Error('Missing ID'))
 
@@ -53,7 +54,7 @@ export default function SimpleUpload({ setPrediction }) {
         if (!response.ok) {
           throw new Error(`Server rejected file with status: ${response.status}`);
         }
-        
+
         const predictionResult = await response.json();
 
         setPrediction(predictionResult.predicted_result);
@@ -62,12 +63,12 @@ export default function SimpleUpload({ setPrediction }) {
       } catch (err) {
         // Catch syntax errors from JSON.parse or server response rejections
         setStatus('');
-        setError(`Strict Error: ${err.message}`);
+        setError(`Error: ${err.message}`);
       }
     };
 
     reader.onerror = () => {
-      setError('Strict Error: Could not read the file from disk.');
+      setError('Error: Could not read the file from disk.');
     };
 
     // Read the binary file object as raw text

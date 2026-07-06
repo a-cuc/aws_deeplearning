@@ -22,20 +22,32 @@ class LSTMModel(nn.Module):
         out, _ = self.lstm(x, (h0, c0))
         out = self.fc(out[:, -1, :])
         return out
-model = LSTMModel(input_size=2, hidden_size=24, num_layers=3, output_size=96).cpu()
+model = LSTMModel(input_size=4, hidden_size=24, num_layers=3, output_size=96).cpu()
 quantize_(model, Int8DynamicActivationInt8WeightConfig())
 
 # Loading the trained model and scaler
 model.load_state_dict(torch.load('/opt/ml/model/quantized_pruned_lstm_model.pth', map_location=torch.device('cpu')))
 scaler = joblib.load('/opt/ml/model/scaler.pkl')
 
-def preprocess_input(ac_power, dc_power):
-    if len(ac_power) != 96 or len(dc_power) != 96:
-        raise ValueError("AC_POWER and DC_POWER must each contain exactly 96 values")
+def preprocess_input(ac_power, dc_power, tod_sin, tod_cos):
+    if not all(len(arr) == 96 for arr in [ac_power, dc_power, tod_sin, tod_cos]):
+        raise ValueError(
+            "AC_POWER, DC_POWER, TOD_SIN, and TOD_COS must each contain exactly 96 values"
+        )
 
-    raw_data = np.column_stack((ac_power, dc_power))
-    scaled_data = scaler.transform(raw_data)
-    return torch.tensor(scaled_data, dtype=torch.float32).unsqueeze(0)
+    # Scale only AC_POWER and DC_POWER
+    scaled_power = scaler.transform(
+        np.column_stack((ac_power, dc_power))
+    )
+
+    # Append the time features (already in [-1, 1], so don't scale)
+    X = np.column_stack((
+        scaled_power,
+        tod_sin,
+        tod_cos
+    ))
+
+    return torch.tensor(X, dtype=torch.float32).unsqueeze(0)
 
 
 def inverse_scale_ac_power(prediction_scaled):
@@ -59,8 +71,10 @@ def lambda_handler(event, context):
 
     ac_power = body["AC_POWER"]
     dc_power = body["DC_POWER"]
+    tod_sin = body["TOD_SIN"]
+    tod_cos = body["TOD_COS"]
 
-    X = preprocess_input(ac_power, dc_power).cpu()
+    X = preprocess_input(ac_power, dc_power, tod_sin, tod_cos).cpu()
 
     with torch.no_grad():
         prediction_scaled = model(X).cpu().numpy().ravel()
