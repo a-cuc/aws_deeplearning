@@ -47,6 +47,8 @@ def inverse_scale_ac_power(prediction_scaled):
 
 
 def lambda_handler(event, context): 
+    # Console check for debugging
+    print("Event:", json.dumps(event, indent=2))
 
     # Check if the event contains a body (for API Gateway) or is a direct invocation
     if "body" in event:

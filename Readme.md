@@ -13,3 +13,24 @@ For inference, the expected JSON format are 2 arrays for `AC_POWER` and `DC_POWE
 }
 ```
 Sample data can be found in [/samples](samples) directory
+
+## Trying it out locally
+
+Build the container
+```sh
+cd sam-app
+sam build
+```
+
+Start the lambda function locally
+```sh
+sam local start-lambda
+```
+
+In a separate terminal, invoke the lambda function
+```sh
+aws lambda invoke --function-name "InferenceFunction" \
+--endpoint-url "http://127.0.0.1:3001" \
+--no-verify-ssl --payload "file://samples/sample_0.json" \
+--cli-binary-format "raw-in-base64-out" out.txt
+```
